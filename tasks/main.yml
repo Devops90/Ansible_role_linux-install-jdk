@@ -2,16 +2,28 @@
 # tasks file for jdk
  - name: install java latest
    yum:
-    name: java
+    name: "{{ java_version }}"
     state: present
+   register: output
    tags: java
-# if alrady install skip the installation use tags
+# check java version
  - command: java -version
-   tags: java version
+   register: output1
+   tags: java_version
  - name: jdk path set (or) environment variables set
    lineinfile:
     dest: /root/.bashrc
     line: "{{item}}"
+   register: output2
    with_items:
      - 'export JAVA_HOME="/usr/lib/jvm/jre-11-openjdk"'
      - 'export PATH=$JAVA_HOME/bin:$PATH'
+   tags: environment
+ - name: print output
+   debug:
+     var: "{{ item }}"
+   loop:
+     - output
+     - output1
+     - output2
+
